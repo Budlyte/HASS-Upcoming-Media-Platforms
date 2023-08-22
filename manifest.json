@@ -1,0 +1,9 @@
+{
+    "domain": "radarr_upcoming_media",
+    "name": "Radarr Upcoming Media",
+    "version": "0.0.1",
+    "documentation": "None",
+    "dependencies": [],
+    "codeowners": ["@Budlyte"],
+    "requirements": []
+  }
