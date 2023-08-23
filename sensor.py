@@ -2,7 +2,7 @@
 Home Assistant component to feed the Upcoming Media Lovelace card with
 Radarr upcoming releases.
 
-https://github.com/Budlyte/radarr_upcoming_media
+https://github.com/custom-components/sensor.radarr_upcoming_media
 
 https://github.com/custom-cards/upcoming-media-card
 
@@ -116,19 +116,20 @@ class SonarrUpcomingMediaSensor(Entity):
                 card_item['genres'] = ', '.join(movie['collection']['genres'])
             else:
                 card_item['genres'] = ''
-            try:
-                for img in movie['images']:
-                    if img['coverType'] == 'poster':
-                        card_item['poster'] = img['url']
-            except:
-                continue
-            try:
+
+            if 'id' in movie:
+                movid = movie['id']
+                posterpath = requests.get('http://{0}:{1}/api/v3/mediacover/{2}/poster-250.jpg?apikey={3}'.format(self.host, self.port, movid, self.apikey), headers={'X-Api-Key': self.apikey}, timeout=10)
+                fanartpath = requests.get('http://{0}:{1}/api/v3/mediacover/{2}/fanart.jpg?apikey={3}'.format(self.host, self.port, movid, self.apikey), headers={'X-Api-Key': self.apikey}, timeout=10)
+                
+                card_item['poster'] = img['posterpath']
+                card_item['fanart'] = img['fanartpath']
+
+            else:
+                fanid = ''
+                card_item['poster'] = ''
                 card_item['fanart'] = ''
-                for img in movie['images']:
-                    if img['coverType'] == 'fanart':
-                        card_item['fanart'] = img['url']
-            except:
-                pass
+
             card_json.append(card_item)
         attributes['data'] = card_json
         return attributes
