@@ -2,7 +2,7 @@
 Home Assistant component to feed the Upcoming Media Lovelace card with
 Radarr upcoming releases.
 
-https://github.com/custom-components/sensor.radarr_upcoming_media
+https://github.com/Budlyte/radarr_upcoming_media
 
 https://github.com/custom-cards/upcoming-media-card
 
