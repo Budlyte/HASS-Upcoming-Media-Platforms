@@ -1,9 +1,7 @@
 """
 Home Assistant component to feed the Upcoming Media Lovelace card with
 Radarr upcoming releases.
-
 https://github.com/Budlyte/radarr_upcoming_media
-
 https://github.com/custom-cards/upcoming-media-card
 
 """
@@ -18,14 +16,16 @@ from homeassistant.components.sensor import PLATFORM_SCHEMA
 from homeassistant.const import CONF_API_KEY, CONF_HOST, CONF_PORT, CONF_SSL
 from homeassistant.helpers.entity import Entity
 
-__version__ = '0.0.1'
+__version__ = '0.1.1'
 
 _LOGGER = logging.getLogger(__name__)
 
 CONF_DAYS = 'days'
 CONF_URLBASE = 'urlbase'
-CONF_MAX = 'max'
+CONF_MAX = '2'
 
+
+    
 PLATFORM_SCHEMA = PLATFORM_SCHEMA.extend({
     vol.Required(CONF_API_KEY): cv.string,
     vol.Optional(CONF_DAYS, default='7'): cv.string,
@@ -33,15 +33,15 @@ PLATFORM_SCHEMA = PLATFORM_SCHEMA.extend({
     vol.Optional(CONF_PORT, default=7878): cv.port,
     vol.Optional(CONF_SSL, default=False): cv.boolean,
     vol.Optional(CONF_URLBASE, default=''): cv.string,
-    vol.Optional(CONF_MAX, default=5): cv.string,
+    vol.Optional(CONF_MAX, default='10'): cv.string,
 })
 
 
 def setup_platform(hass, config, add_devices, discovery_info=None):
-    add_devices([SonarrUpcomingMediaSensor(hass, config)], True)
+    add_devices([RadarrUpcomingMediaSensor(hass, config)], True)
 
 
-class SonarrUpcomingMediaSensor(Entity):
+class RadarrUpcomingMediaSensor(Entity):
 
     def __init__(self, hass, conf):
         from pytz import timezone
@@ -56,7 +56,7 @@ class SonarrUpcomingMediaSensor(Entity):
         self._state = None
         self.data = []
         self._tz = timezone(str(hass.config.time_zone))
-        self.max_items = int(conf.get(CONF_MAX))
+        self.max_items = int(10)
 
     @property
     def name(self):
@@ -84,11 +84,16 @@ class SonarrUpcomingMediaSensor(Entity):
             card_item = {}
             if 'collection' not in movie:
                 continue
-            card_item['airdate'] = movie['digitalRelease']
-            if days_until(movie['digitalRelease'], self._tz) <= 7:
-                card_item['release'] = '$day, $time'
+            if 'digitalRelease' in movie:
+                card_item['airdate'] = movie['digitalRelease']
+                if days_until(movie['digitalRelease'], self._tz) <= 7:
+                    card_item['release'] = '$day, $time'
+                else:
+                    card_item['release'] = '$day, $date $time'
             else:
-                card_item['release'] = '$day, $date $time'
+                card_item['airdate'] = ''
+                card_item['release'] = ''
+            
             card_item['flag'] = movie.get('hasFile', False)
             
             if 'title' in movie['collection']:
