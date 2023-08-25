@@ -121,19 +121,19 @@ class RadarrUpcomingMediaSensor(Entity):
                 card_item['genres'] = ', '.join(movie['collection']['genres'])
             else:
                 card_item['genres'] = ''
-            try:
-                for img in movie['images']:
-                    if img['coverType'] == 'poster':
-                        card_item['poster'] = img['url']
-            except:
-                continue
-            try:
+            
+            if 'id' in movie:
+                movid = movie['id']
+            else:
+                movid = ''
+                
+            if 'images' in movie:
+                card_item['poster'] = 'http{0}://{1}:{2}/{3}api/v3/mediacover/{4}/poster-250.jpg?apikey={5}'.format(self.ssl, self.host,self.port,self.urlbase,movid,self.apikey)
+                card_item['fanart'] = 'http{0}://{1}:{2}/{3}api/v3/mediacover/{4}/fanart.jpg?apikey={5}'.format(self.ssl, self.host,self.port,self.urlbase,movid,self.apikey)
+            else:
+                card_item['poster'] = ''
                 card_item['fanart'] = ''
-                for img in movie['images']:
-                    if img['coverType'] == 'fanart':
-                        card_item['fanart'] = img['url']
-            except:
-                pass
+                
             card_json.append(card_item)
         attributes['data'] = card_json
         return attributes
