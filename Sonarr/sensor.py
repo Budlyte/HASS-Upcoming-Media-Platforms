@@ -2,8 +2,7 @@
 Home Assistant component to feed the Upcoming Media Lovelace card with
 Sonarr upcoming releases.
 
-https://github.com/custom-components/sensor.radarr_upcoming_media
-
+https://github.com/Budlyte/HASS-Upcoming-Media-Platforms/tree/Local-Images
 https://github.com/custom-cards/upcoming-media-card
 
 """
