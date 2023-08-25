@@ -78,7 +78,7 @@ class RadarrUpcomingMediaSensor(Entity):
         default['line2_default'] = '$release'
         default['line3_default'] = 'Runtime: ''$runtime'
         default['line4_default'] = '$rating'
-        default['icon'] = 'mdi:arrow-down-bold'
+        default['icon'] = ''
         card_json.append(default)
         for movie in self.data:
             card_item = {}
