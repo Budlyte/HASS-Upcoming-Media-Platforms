@@ -7,7 +7,7 @@ Be sure to add the below to your configuration.yaml
       days: 7  
       ssl: false  
       max: 10  
-And this to your UI-lovelace.yaml
-&ndash; type: custom:upcoming-media-card
-  entity: sensor.radarr_upcoming_media
-  title: Upcoming Movies
+And this to your UI-lovelace.yaml  
+&ndash; type: custom:upcoming-media-card  
+  entity: sensor.radarr_upcoming_media  
+  title: Upcoming Movies  
