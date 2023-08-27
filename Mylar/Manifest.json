@@ -1,0 +1,9 @@
+{
+    "domain": "mylar_upcoming_media",
+    "name": "Mylar Upcoming Media",
+    "version": "0.0.1",
+    "documentation": "None",
+    "dependencies": [],
+    "codeowners": ["@Budlyte"],
+    "requirements": []
+  }
