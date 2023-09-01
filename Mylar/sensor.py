@@ -22,8 +22,6 @@ _LOGGER = logging.getLogger(__name__)
 
 CONF_DAYS = 'days'
 CONF_URLBASE = 'urlbase'
-CONF_MAX = '2'
-
 
     
 PLATFORM_SCHEMA = PLATFORM_SCHEMA.extend({
@@ -33,7 +31,6 @@ PLATFORM_SCHEMA = PLATFORM_SCHEMA.extend({
     vol.Optional(CONF_PORT, default=8090): cv.port,
     vol.Optional(CONF_SSL, default=False): cv.boolean,
     vol.Optional(CONF_URLBASE, default=''): cv.string,
-    vol.Optional(CONF_MAX, default='2'): cv.string,
 })
 
 
@@ -55,7 +52,6 @@ class MylarUpcomingMediaSensor(Entity):
         self._state = None
         self.data = []
         self.comicinfo = []
-        self.max_items = int(10)
 
     @property
     def name(self):
@@ -73,29 +69,33 @@ class MylarUpcomingMediaSensor(Entity):
         default = {}
         card_json = []
         default['title_default'] = '$title'
-        default['line1_default'] = 'Issue: $episode'
-        default['line2_default'] = ''
-        default['line3_default'] = '$studio'
-        default['line4_default'] = ''
-        default['icon'] = 'mdi:arrow-down-bold'
+        default['line1_default'] = '$episode'
+        default['line2_default'] = 'Issue: $number'
+        default['line3_default'] = ''
+        default['line4_default'] = '$studio'
+        default['icon'] = ''
         card_json.append(default)
         for comic in self.data:
             card_item = {}
             
             card_item['airdate'] = comic['IssueDate']
-            card_item['title'] = comic['ComicName']
             
-            if 'IssueNumber' in comic:
-                card_item['episode'] = comic['IssueNumber']
+            title_string = comic['ComicName']
+            if ':' in title_string:
+                split_title = [part.strip() for part in title_string.split(':')]
+
+                card_item['title'] = split_title[0]
+                card_item['episode'] = split_title[1]
             else:
+                card_item['title'] = comic['ComicName']
                 card_item['episode'] = ''
             
-            if 'ComicID' in comic:
-                comicid = comic['ComicID']
+            if 'IssueNumber' in comic:
+                card_item['number'] = comic['IssueNumber']
             else:
-                comicid = ''
-
+                card_item['number'] = ''
             
+
             card_item['poster'] = ''
             card_item['fanart'] = ''
             
@@ -116,6 +116,6 @@ class MylarUpcomingMediaSensor(Entity):
 
         if api.status_code == 200:
             self._state = 'Online'
-            self.data = api.json()[:self.max_items]
+            self.data = api.json()
         else:
             self._state = '%s cannot be reached' % self.host
