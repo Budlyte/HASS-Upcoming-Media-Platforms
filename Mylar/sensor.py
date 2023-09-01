@@ -54,6 +54,7 @@ class MylarUpcomingMediaSensor(Entity):
         self.ssl = 's' if conf.get(CONF_SSL) else ''
         self._state = None
         self.data = []
+        self.comicinfo = []
         self.max_items = int(10)
 
     @property
@@ -72,20 +73,58 @@ class MylarUpcomingMediaSensor(Entity):
         default = {}
         card_json = []
         default['title_default'] = '$title'
-        default['line1_default'] = ''
+        default['line1_default'] = 'Issue: $episode'
         default['line2_default'] = ''
-        default['line3_default'] = ''
+        default['line3_default'] = '$studio'
         default['line4_default'] = ''
         default['icon'] = 'mdi:arrow-down-bold'
         card_json.append(default)
         for comic in self.data:
             card_item = {}
             
+            card_item['airdate'] = comic['IssueDate']
             card_item['title'] = comic['ComicName']
             
+            if 'IssueNumber' in comic:
+                card_item['episode'] = comic['IssueNumber']
+            else:
+                card_item['episode'] = ''
+            
+            if 'ComicID' in comic:
+                comicid = comic['ComicID']
+            else:
+                comicid = ''
+            if comicid:
+                try:
+                    seriesinfo = requests.get('http{0}://{1}:{2}/{3}api?cmd=getComic&id={4}'
+                               '&apikey={5}'.format(self.ssl, self.host,
+                                                 self.port, self.urlbase, 
+                                                 comicid, self.apikey), timeout=10)
+
+                    for info in self.comicinfo[data]:
+                        
+                        if 'publisher' in info['comic']:
+                            card_item['studio'] = info['comic']['publisher']
+                        else:
+                            card_item['studio'] = ''
+                        
+                        if 'imageURL' in info['comic']:
+                            card_item['poster'] = info['comic']['imageURL']
+                            card_item['fanart'] = info['comic']['imageURL']
+                        else:
+                            card_item['poster'] = ''
+                            card_item['fanart'] = ''
+                
+                except:
+                    return
+
+                if seriesinfo.status_code == 200:
+                    self.comicinfo = seriesinfo.json()
+                else:
+                    self.comicinfo = []
             card_json.append(card_item)
-        attributes['data'] = card_json
-        return attributes
+            attributes['data'] = card_json
+            return attributes
 
     def update(self):
         try:
