@@ -94,41 +94,18 @@ class MylarUpcomingMediaSensor(Entity):
                 comicid = comic['ComicID']
             else:
                 comicid = ''
-            if comicid:
-                try:
-                    seriesinfo = requests.get('http{0}://{1}:{2}/{3}api?cmd=getComic&id={4}'
-                               '&apikey={5}'.format(self.ssl, self.host,
-                                                 self.port, self.urlbase, 
-                                                 comicid, self.apikey), timeout=10)
 
-                    for info in self.comicinfo[data]:
-                        
-                        if 'publisher' in info['comic']:
-                            card_item['studio'] = info['comic']['publisher']
-                        else:
-                            card_item['studio'] = ''
-                        
-                        if 'imageURL' in info['comic']:
-                            card_item['poster'] = info['comic']['imageURL']
-                            card_item['fanart'] = info['comic']['imageURL']
-                        else:
-                            card_item['poster'] = ''
-                            card_item['fanart'] = ''
-                
-                except:
-                    return
-
-                if seriesinfo.status_code == 200:
-                    self.comicinfo = seriesinfo.json()
-                else:
-                    self.comicinfo = []
+            
+            card_item['poster'] = ''
+            card_item['fanart'] = ''
+            
             card_json.append(card_item)
             attributes['data'] = card_json
             return attributes
 
     def update(self):
         try:
-            api = requests.get('http{0}://{1}:{2}/{3}api?cmd=getUpcoming&issues=True'
+            api = requests.get('http{0}://{1}:{2}/{3}api?cmd=getUpcoming'
                                '&apikey={4}'.format(self.ssl, self.host,
                                                  self.port, self.urlbase,
                                                  self.apikey), timeout=10)
